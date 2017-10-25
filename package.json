@@ -1,0 +1,30 @@
+{
+  "name": "ib-env",
+  "version": "0.1.0",
+  "description": "Setup trading environments using ib-sdk.",
+  "main": "run.js",
+  "author": "Jonathan Hollinger",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.5.0",
+    "commander": "^2.11.0",
+    "ib-sdk": "^0.10.5",
+    "line-by-line": "^0.1.5",
+    "sugar": "^2.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/triploc/ib-env.git"
+  },
+  "keywords": [
+    "ib-sdk",
+    "ib",
+    "interactive",
+    "brokers",
+    "node-ib"
+  ],
+  "bugs": {
+    "url": "https://github.com/triploc/ib-env/issues"
+  },
+  "homepage": "https://github.com/triploc/ib-env#readme"
+}
