@@ -1,0 +1,11 @@
+{
+    "securities": [ 
+        "AAPL stock",
+        "GOOGL stock",
+        "IBM stock"
+    ],
+    "quote": true,
+    "depth": true,
+    "charts": true,
+    "fundamentals": true
+}

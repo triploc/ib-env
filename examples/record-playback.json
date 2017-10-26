@@ -1,0 +1,4 @@
+{
+    "record": "output.log",
+    "mock": "input.log"
+}

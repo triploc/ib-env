@@ -1,0 +1,7 @@
+{
+    "account": true,
+    "accountSummary": true,
+    "trades": true,
+    "orders": true,
+    "positions": true
+}

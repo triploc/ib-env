@@ -32,13 +32,18 @@ module.exports = (config, cb) => {
         config.session.trace = (name, data) => {
             let msg = (new Date()).getTime() + "|" + name + "|" + JSON.stringify(data) + "\n";
             fs.appendFile(file, msg, err => err ? console.log(err) : null);
-        }
+        };
     }
     
     let mock = open(config.session, (err, session) => {
         if (err) {
             if (cb) cb(err);
-            else config.error(err);
+            else {
+                if (err.code == "ECONNREFUSED") {
+                    config.error(new Error(`Could not connect to IB API endpoint at tcp://${config.session.host}:${config.session.port}. ${err.message}.`));
+                }
+                else config.error(err);
+            }
         }
         else {
             session.on("disconnected", config.disconnected).on("error", config.error);
@@ -140,6 +145,7 @@ function subscribe(env, config, securities, cb) {
             },
             cb => {
                 if (config.fundamentals && security.contract.summary.secType == ib.flags.SECURITY_TYPE.stock && security.fundamentals) {
+                    if (!Array.isArray(config.fundamentals)) config.fundamentals = [ "snapshot", "statements", "consensus" ];
                     async.forEachSeries(config.fundamentals, (report, cb) => security.fundamentals(report, err => cb()), err => cb(err));
                 }
                 else cb();

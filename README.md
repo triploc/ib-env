@@ -31,66 +31,66 @@ If the SDK can establish a working connection, the terminal will start successfu
 
     $ node run --help
 
+The terminal interface automatically assembles a trading environment configuration using command line flags and any JSON files you supply.
+
 #### Run
 
-The `run` method is the programmatic analogy of the command line interface.
+To setup a trading environment you need a configuration.  The `run` method is the programmatic analogy of the terminal interface.  It takes an object and an optional list of files that it mashes together to form a single configuration object.
 
 ```javascript
-require('ib-env').run(configObject, "file_1.json", "file_2.json");
+require('ib-env').run({ 
+    session: { port: 4001 },
+    account: true,
+    securities: [ "AAPL stock", "EUR in USD" ]
+}, [ "file_1.json", "file_2.json" ]);
 ```
 
 #### Setup
 
-Use the `setup` method to build an `environment`.  
+With a fully constructed configuration object, `run` then uses the `setup` method to build an `environment`.  The `environment` contains builder methods that act on the `environment.workspace` object, making it the goto place for most things.
 
 ```javascript
-require('ib-env').setup({
+let configObject = {
     session: { port: 4001 },
     account: true,
-    securities: [ "AAPL stock", "EUR in USD", ]
-}, (err, environment, interactive) => {
+    securities: [ "AAPL stock", "EUR in USD" ]
+};
+
+require('ib-env').setup(configObject, (err, environment, interactive) => {
     if (err) console.log(err);
     else {
-        let account = environment.workspace.account,
-            AAPL = environment.workspace.AAPL;
+        let $ = environment.workspace;
+    
+        let account = $.account,
+            AAPL = $.AAPL;
     
         // OPTIONAL: start repl terminal
         interactive();
+        
+        // Add values to workspace and symbols
+        environment.assign("x", { });
+        $.x == { };
+        environment.free("x");        
     }
 });
 ```
-
-#### Interactive
 
 An `interactive` callback is returned which can optionally start a REPL interface for debugging and interactive development.  Once called, the `environment.workspace` is the `context` for the REPL command-line interface.  That means values added to the `environment.workspace` object can be referenced directly from the command line (i.e. AAPL in the code above).
 
     > AAPL.contract.summary
 
-#### Workspace
-
-The `environment` contains builder methods that act on the `environment.workspace` object, making it the goto place for consuming data.
-
-```javascript
-let symbols = environment.workspace.symbols;
-            
-// Add values to workspace and symbols
-environment.assign("x", { });
-environment.free("x");
-```
-    
 ## Configuration
 
-A configuration object may be supplied directly to the `setup` global method.  
+So what is in a configuration?  It basically encompasses all the functionality in the [ib-sdk](http://github.com/triploc/ib-sdk) and can be broken down into three parts:
 
-The terminal interface automatically assembles a configuration using a combination of command line flags and a list of JSON files.
+1) Balances & Trading
+2) Market Data
+3) Low-Level Settings
 
-The configuration object may contain the following fields:
+#### Balances & Trading
 
-* __session__ - _object_ 
-    - __host__ - _string_ - hostname or ip address
-    - __port__ - _number_ - port number
-    - __clientId__ - _number_ - specify client id
-    - __timeout__ - _number_ - milliseconds to wait for connection
+The following fields can take a simple boolean value to indicate these parts of the object model should be opened in entirity.  Otherwise, a specific configuration can be supplied.
+
 * __account__
     - _boolean_ - use default account id
     - _string_ - use specific account id
@@ -121,6 +121,11 @@ The configuration object may contain the following fields:
         - __name__ - _string_ - override workspace name
 * __orders__
     - _boolean_ - stream all orders
+
+When interfacing with a single account, it is easiest to use the __account__ configuration setting.  A single account will automatically load positions associated with that account within the account object model.  Otherwise, you can use the __accountSummary__ or the light-weight __positions__ configuration settings to load balance and position information over multiple accounts.    
+    
+#### Market Data
+    
 * __securities__
     - _array_ - a list of security descriptions to load
 * __curves__
@@ -146,6 +151,16 @@ The configuration object may contain the following fields:
         - __types__ - _array_ - list of quote tick type classes to use
         - __fields__ - _array_ - list of quote tick type fields to use
 * __frozen__ - _boolean_ - set quote market data type from live to frozen
+
+#### Advanced Settings
+
+Low-level settings do not necessarily have to be set except in more advanced use cases.  The following fields are used to configure the socket connection, the terminal interface, error handling, and event logging & playback (i.e. a mock environment).
+
+* __session__ - _object_ 
+    - __host__ - _string_ - hostname or ip address
+    - __port__ - _number_ - port number
+    - __clientId__ - _number_ - specify client id
+    - __timeout__ - _number_ - milliseconds to wait for connection
 * __repl__
     - _boolean_ - open REPL with default cursor
     - _string_ - open REPL with specified cursor
