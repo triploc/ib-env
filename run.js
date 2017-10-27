@@ -23,14 +23,10 @@ prog.version('0.1.0')
     .option('--orders', 'Stream orders')
     .option('--positions', 'Stream positions')
     /* Market Data */
+    .option('--frozen', 'Use frozen quote data (useful for after-hours).')
     .option('--securities <list>', 'Load securities', list)
     .option('--curves <list>', 'Load curves', list)
-    .option('--chains <list>', 'Load option chains', list)
-    .option('--quote [list]', 'Stream quote with types', list)
-    .option('--fundamentals [list]', 'Load fundamental reports', list)
-    .option('--depth [rows]', 'Load level2 quotes', integer, 5)
-    .option('--charts', 'Stream real-time bars')
-    .option('--frozen', 'Use frozen quote data (useful for after-hours).')
+    .option('--option-chains <list>', 'Load option chains', list)
     .parse(process.argv);
 
 let config = { 
@@ -50,10 +46,7 @@ let config = {
     frozen: prog.frozen,
     securities: prog.securities,
     curves: prog.curves,
-    optionChains: prog.chains,
-    quote: prog.quote,
-    chart: prog.charts,
-    
+    optionChains: prog.chains
 };
 
 require('./index').run(config, prog.args);
